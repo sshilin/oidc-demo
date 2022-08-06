@@ -61,9 +61,10 @@ func LoadToken() (*oauth2.Token, error) {
 	}
 
 	f, err := os.Open(conf)
-	if !os.IsExist(err) {
-		return &oauth2.Token{}, nil
-	} else if err != nil {
+	if err != nil {
+		if !os.IsExist(err) {
+			return &oauth2.Token{}, nil
+		}
 		return nil, err
 	}
 

@@ -209,6 +209,32 @@ func (c *DeviceAuthFlow) RetrieveToken(deviceAuth *DeviceAuthCode) (*oauth2.Toke
 	}
 }
 
+func (c *DeviceAuthFlow) EndSession() error {
+	token, err := LoadToken()
+	if err != nil {
+		return err
+	}
+
+	if token.RefreshToken != "" {
+		values := url.Values{
+			"client_id":     {c.ClientId},
+			"refresh_token": {token.RefreshToken},
+		}.Encode()
+
+		_, err = doHttpPost(c.WellKnown.EndSessionEndpoint, values)
+		if err != nil {
+			return fmt.Errorf("%w: %v", ErrNetworkFailure, err)
+		}
+
+		err = DeleteToken()
+		if err != nil {
+			return fmt.Errorf("%w: %v", ErrNetworkFailure, err)
+		}
+	}
+
+	return nil
+}
+
 func doHttpPost(url string, values string) ([]byte, error) {
 	resp, err := http.Post(url, "application/x-www-form-urlencoded", strings.NewReader(values))
 	if err != nil {
