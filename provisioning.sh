@@ -16,11 +16,13 @@ EOF
 kcadm.sh create clients -r demo -f - << EOF
 {
 	"clientId": "demo-cli",
+	"publicClient": true,
 	"directAccessGrantsEnabled": false,
 	"standardFlowEnabled": false,
 	"attributes": {"oauth2.device.authorization.grant.enabled": "true"}
 }
 EOF
 
-# Create test users
-kcadm.sh create users -s username=user1 -s enabled=true -r demo
+# Create test user
+kcadm.sh create users -r demo -s username=user1 -s enabled=true
+kcadm.sh set-password -r demo --username user1 --new-password 1234
