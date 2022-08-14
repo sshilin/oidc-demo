@@ -1,6 +1,6 @@
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:19.0.1
+    image: quay.io/keycloak/keycloak:18.0.2
     environment:
       - KC_HEALTH_ENABLED=true
       - KEYCLOAK_ADMIN=admin
@@ -15,7 +15,7 @@ services:
       interval: 3s
       retries: 5
   keycloak-provisioner:
-    image: quay.io/keycloak/keycloak:19.0.1
+    image: quay.io/keycloak/keycloak:18.0.2
     depends_on:
       keycloak:
         condition: service_healthy
@@ -24,6 +24,14 @@ services:
     volumes:
       - ./provisioning.sh:/provisioning.sh
     entrypoint: /provisioning.sh
+    networks:
+      - kc-demo-network
+  server:
+    build: ./server
+    environment:
+      - IAM_URL=http://keycloak:8080/realms/demo
+    ports:
+      - "9090:80"
     networks:
       - kc-demo-network
 networks:
